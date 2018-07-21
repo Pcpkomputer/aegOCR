@@ -12,9 +12,9 @@ from glob import glob
 
 class setting:
     txt=''
-    default=''
+    default='Dialogue: 0,{},{},Default,,0,0,0,,\n'
     ffmpeg=''
-    videofile='D:/---/[Anitoki]_TKS_02_[360p].mp4'
+    videofile=''
     _filter=re.compile(r'\d+\s+[^\/]+')
     _filter_time=re.compile(r'\d+')
     path='temp.txt'

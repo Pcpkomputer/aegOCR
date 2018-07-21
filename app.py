@@ -6,17 +6,25 @@ import time
 import os
 import re
 import math
+import pytesseract
 import subprocess
 from glob import glob
 
 class setting:
     txt=''
-    default='Dialogue: 0,{},{},Default,,0,0,0,,\n'
-    ffmpeg='D:/projeskaksdskad/module/ffmpeg'
+    default=''
+    ffmpeg=''
     videofile='D:/---/[Anitoki]_TKS_02_[360p].mp4'
     _filter=re.compile(r'\d+\s+[^\/]+')
     _filter_time=re.compile(r'\d+')
     path='temp.txt'
+    def __init__(self):
+        with open('SETTING.ini', 'r', encoding='utf-8') as t:
+            text=t.read()
+            self.ffmpeg=re.search(r"ffmpeg='(.*)'",str(text)).group(1)
+            self.videofile=re.search(r"videofile='(.*)'",str(text)).group(1)
+            t.close()
+            
     class _720p:
         #SETTING 720p
         MARGIN_TOP=31
@@ -32,8 +40,8 @@ class setting:
         MARGIN_TOP=31
         MARGIN_LEFT=280
         MARGIN_RIGHT=550
-
-
+    
+    
 
 def template(x):
     with open('template.yudha', 'r', encoding='utf-8') as template:
@@ -155,8 +163,22 @@ def bacadialog():
         cv2.imwrite('images/im_'+str(frameawal)+'.jpg',frame)
     cap.release()
 
+def ocr():
+    file=glob('images/*')
+    for w in file:
+        images=cv2.imread(x)
+        p,o,i=images.shape
+        z=Image.open(w)
+        imz=z.crop((0,p-100,o,p))
+        im=np.array(imz)
+        cv2.imshow("cropped", im)
+        cv2.waitKey(0)
+        print(pytesseract.image_to_string(imz))
+
 if __name__=='__main__':
     setting=setting()
+    #print(setting.path)
+    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files (x86)\Tesseract-OCR\tesseract'
     #_360p()
     if len(os.listdir('images'))>0:
         for x in glob('images/*'):
@@ -167,11 +189,12 @@ if __name__=='__main__':
     zipfile,last=parser(obj)
     timecode=sentuhanakhir_timecode(zipfile, last)
     template=template(timecode)
-    print(template)
+    #print(template)
     bacadialog()
     with open('final.ass','w',encoding='utf-8') as final:
         final.write(template)
         final.close()
+    ocr()
     
           
 
